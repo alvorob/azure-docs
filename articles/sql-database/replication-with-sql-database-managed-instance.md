@@ -90,9 +90,11 @@ Supports:
    ```sql
    USE [master]​
    GO
-   EXEC sp_adddistributor @distributor = @@ServerName​;
+   EXEC sp_adddistributor @distributor = @@ServerName, @password = N'<DISTRIBUTOR_ADMIN_PASSWORD>'​;
    EXEC sp_adddistributiondb @database = N'distribution'​;
    ```
+   >[!NOTE]
+   >If you set up local distributor, it's better to provide NULL for a @password or ommit this parameter. For a remote one, provide the password same to what should be used later on a publisher side.
 
 7. To configure a publisher to use a specified distribution database, update and run the following query.
 
@@ -115,6 +117,8 @@ Supports:
                 @storage_connection_string = N'<STORAGE_CONNECTION_STRING>';
    GO​
    ```
+   >[!NOTE]
+   >If you set up remote distributor, make sure you provided publisher's fully qualified domain name for @publisher parameter, but not @@ServerName, which will be your distributor server in this case.
 
 8. Configure the publisher for replication.
 
@@ -125,6 +129,11 @@ Supports:
     Replace `<SQL_USER>` and `<PASSWORD>` with the SQL Server Account and password.
 
     After you update the query, run it to create the publication.
+
+   ```
+   >[!NOTE]
+   >If you set up remote distributor, you will first need to run following command on a publisher, to specify your remote distributor, providing its fully qualified domain name and administrative login password, as it was configured above on distributor server:
+   >```EXEC sp_adddistributor @distributor = N'<DISTRIBUTOR_FQDN>', @password = N'<DISTRIBUTOR_ADMIN_PASSWORD>'```​;
 
    ```sql
    USE [<Publishing_DB>]​
